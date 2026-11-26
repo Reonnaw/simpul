@@ -1,23 +1,43 @@
 @import "tailwindcss";
+
+/* Rubah malam: arang hangat sebagai dasar, oranye rubah untuk momen penting, biru es untuk data. */
 @theme {
-  --color-bg: #0B141B;
-  --color-surface: #13222D;
-  --color-line: #23394A;
-  --color-ink: #E6EDF2;
-  --color-muted: #8FA3B3;
-  --color-primary: #2BB3A8;
-  --color-accent: #F2711C;
-  --color-ok: #3FBF6F;
-  --color-warn: #E8B23A;
-  --color-bad: #E5484D;
+  --color-bg: #14110f;
+  --color-surface: #1d1916;
+  --color-raised: #27221e;
+  --color-line: #3a322c;
+  --color-ink: #f2e8da;
+  --color-muted: #b3a595;
+  --color-fox: #ff7a2f;
+  --color-fox-deep: #c9531a;
+  --color-ice: #8cc8e6;
+  --color-ok: #8fd18a;
+  --color-warn: #f2c14e;
+  --color-bad: #ff6b6b;
 }
 
 @theme inline {
   --font-sans: var(--font-jakarta);
+  --font-display: var(--font-bricolage);
   --font-mono: var(--font-jetbrains);
+}
+
+:root {
+  color-scheme: dark;
+  accent-color: var(--color-fox);
 }
 
 body {
   background: var(--color-bg);
   color: var(--color-ink);
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-fox);
+  outline-offset: 2px;
+}
+
+::selection {
+  background: var(--color-fox);
+  color: var(--color-bg);
 }
