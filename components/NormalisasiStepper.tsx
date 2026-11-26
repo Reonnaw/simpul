@@ -44,23 +44,27 @@ export default function NormalisasiStepper() {
     const [i, setI] = useState(0);
     const l = LANGKAH[i];
     return (
-        <section className="space-y-3 rounded-xl border border-line bg-surface p-4">
-            <div className="flex flex-wrap gap-2" role="tablist">
+        <section className="space-y-4 rounded-xl border border-line bg-surface p-4 sm:p-5">
+            <ol className="flex flex-wrap gap-2">
                 {LANGKAH.map((x, j) => (
-                    <button key={x.nama} role="tab" aria-selected={i === j} onClick={() => setI(j)}
-                        className={`rounded-lg px-3 py-1 text-sm ${i === j ? "bg-accent text-bg" : "border border-line"}`}>
-                        {x.nama}
-                    </button>
+                    <li key={x.nama}>
+                        <button aria-pressed={i === j} onClick={() => setI(j)}
+                            className={`flex min-h-11 items-center gap-2 rounded-lg border px-3 text-sm ${i === j ? "border-fox bg-raised font-semibold" : "border-line text-muted hover:text-ink"}`}>
+                            <span className={`grid size-6 place-items-center rounded-md text-xs ${i === j ? "bg-fox text-bg" : "bg-raised"}`}>{j + 1}</span>
+                            {x.nama}
+                        </button>
+                    </li>
                 ))}
-            </div>
-            <p className="text-sm text-muted">{l.ket}</p>
+            </ol>
+            <p className="max-w-3xl leading-relaxed">{l.ket}</p>
             <div className="grid gap-3 sm:grid-cols-2">
                 {l.tabel.map((t) => (
                     <div key={t.n} className="rounded-lg border border-line bg-bg p-3">
-                        <h3 className="mb-2 font-mono text-sm font-semibold text-primary">{t.n}</h3>
+                        <h3 className="mb-2 font-mono text-sm font-semibold">{t.n}</h3>
                         <div className="flex flex-wrap gap-1">
                             {t.k.map((k) => (
-                                <span key={k} className={`rounded px-1.5 py-0.5 font-mono text-xs ${k.startsWith("#") ? "bg-accent/20 underline" : k.endsWith("→") ? "bg-primary/20" : "bg-surface"}`}>
+                                <span key={k} className={`rounded-md px-1.5 py-0.5 font-mono text-xs ${
+                                    k.startsWith("#") ? "bg-fox/15 text-fox underline underline-offset-2" : k.endsWith("→") ? "bg-ice/15 text-ice" : "bg-raised"}`}>
                                     {k.replace("#", "")}
                                 </span>
                             ))}
@@ -68,7 +72,10 @@ export default function NormalisasiStepper() {
                     </div>
                 ))}
             </div>
-            <p className="text-xs text-muted">Garis bawah = PRIMARY KEY, latar teal = FOREIGN KEY.</p>
+            <p className="text-xs text-muted">
+                <span className="text-fox underline underline-offset-2">Oranye bergaris bawah</span> = PRIMARY KEY,{" "}
+                <span className="text-ice">biru es dengan →</span> = FOREIGN KEY.
+            </p>
         </section>
     );
 }
