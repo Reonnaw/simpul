@@ -3,6 +3,7 @@ import { connection } from "next/server";
 import type { Document } from "mongodb";
 import { runPipeline } from "@/lib/mongo";
 import QueryCard from "@/components/QueryCard";
+import { cobaMongo } from "@/lib/konsol";
 import Memuat from "@/components/Memuat";
 import Kepala from "@/components/Kepala";
 import BarMini from "@/components/BarMini";
@@ -164,14 +165,16 @@ async function Isi() {
                 </form>
                 <div className="grid gap-4 xl:grid-cols-2">
                     <QueryCard title="Isi REKAP_KATEGORI_BARANG" materi="find()" query="db.REKAP_KATEGORI_BARANG.find().sort({ total_nilai: -1 })"
+                        coba={cobaMongo("REKAP_KATEGORI_BARANG", [{ $sort: { total_nilai: -1 } }])}
                         rows={rekap.rows} error={rekap.error} />
                     <QueryCard title="Isi RINGKASAN_PELANGGAN" materi="find()" query="db.RINGKASAN_PELANGGAN.find().sort({ _id: 1 })"
+                        coba={cobaMongo("RINGKASAN_PELANGGAN", [{ $sort: { _id: 1 } }])}
                         rows={ringkasan.rows} error={ringkasan.error} />
                 </div>
             </QueryCard>
 
             {DAFTAR.map((it, i) => (
-                <QueryCard key={it.title} title={it.title} materi={it.materi} query={it.pipeline} rows={hasil[i].rows} error={hasil[i].error}>
+                <QueryCard key={it.title} title={it.title} materi={it.materi} query={it.pipeline} coba={cobaMongo(it.coll, it.pipeline)} rows={hasil[i].rows} error={hasil[i].error}>
                     {it.chart && !hasil[i].error && hasil[i].rows.length > 0 && <BarMini data={hasil[i].rows} x={it.chart[0]} y={it.chart[1]} />}
                 </QueryCard>
             ))}

@@ -2,6 +2,7 @@ import { Suspense } from "react";
 import { connection } from "next/server";
 import { runPipeline } from "@/lib/mongo";
 import QueryCard, { GagalQuery } from "@/components/QueryCard";
+import { cobaMongo } from "@/lib/konsol";
 import Memuat from "@/components/Memuat";
 import Kepala from "@/components/Kepala";
 import TruckScene, { type Util } from "@/components/three/TruckScene";
@@ -25,7 +26,7 @@ async function Isi() {
     return (
         <>
             {u.error ? <GagalQuery error={u.error} /> : <TruckScene data={u.rows as Util[]} />}
-            <QueryCard title="Utilisasi per penugasan" materi="$lookup ×3 + $unwind + $divide" query={UTIL} rows={u.rows} error={u.error}
+            <QueryCard title="Utilisasi per penugasan" materi="$lookup ×3 + $unwind + $divide" query={UTIL} coba={cobaMongo("PENUGASAN_ARMADA", UTIL)} rows={u.rows} error={u.error}
                 note="Empat collection digabung: penugasan, pengiriman, barang, dan kendaraan." />
         </>
     );

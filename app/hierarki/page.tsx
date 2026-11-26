@@ -3,6 +3,7 @@ import Link from "next/link";
 import { connection } from "next/server";
 import { runPipeline } from "@/lib/mongo";
 import QueryCard from "@/components/QueryCard";
+import { cobaMongo } from "@/lib/konsol";
 import Memuat from "@/components/Memuat";
 import Kepala from "@/components/Kepala";
 import TreeScene, { type Simpul } from "@/components/three/TreeScene";
@@ -54,9 +55,9 @@ async function Isi({ searchParams }: { searchParams: PageProps<"/hierarki">["sea
                 ))}
             </nav>
             <TreeScene nodes={b.error ? [] : (b.rows as Simpul[])} />
-            <QueryCard title="Seluruh bawahan kantor pusat" materi="$graphLookup + maxDepth + $unwind" query={bawahan} rows={b.rows} error={b.error} />
-            <QueryCard title="Rantai atasan setiap cabang" materi="$graphLookup + $sortArray + $map" query={rantai} rows={r.rows} error={r.error} />
-            <QueryCard title="Cabang yang terjangkau dari Semarang lewat rute pengiriman" materi="$graphLookup antarcollection" query={jaringan} rows={j.rows} error={j.error} />
+            <QueryCard title="Seluruh bawahan kantor pusat" materi="$graphLookup + maxDepth + $unwind" query={bawahan} coba={cobaMongo("KANTOR_CABANG", bawahan)} rows={b.rows} error={b.error} />
+            <QueryCard title="Rantai atasan setiap cabang" materi="$graphLookup + $sortArray + $map" query={rantai} coba={cobaMongo("KANTOR_CABANG", rantai)} rows={r.rows} error={r.error} />
+            <QueryCard title="Cabang yang terjangkau dari Semarang lewat rute pengiriman" materi="$graphLookup antarcollection" query={jaringan} coba={cobaMongo("KANTOR_CABANG", jaringan)} rows={j.rows} error={j.error} />
         </>
     );
 }

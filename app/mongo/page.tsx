@@ -3,6 +3,7 @@ import { connection } from "next/server";
 import type { Document, Sort } from "mongodb";
 import { getDb, plain } from "@/lib/mongo";
 import QueryCard from "@/components/QueryCard";
+import { cobaMongo } from "@/lib/konsol";
 import Memuat from "@/components/Memuat";
 import Kepala from "@/components/Kepala";
 import { KATEGORI } from "@/lib/opsi";
@@ -89,6 +90,7 @@ async function Isi({ searchParams }: { searchParams: PageProps<"/mongo">["search
             <QueryCard
                 title={`${jumlah} barang cocok`}
                 materi="find · sort · limit · countDocuments · distinct"
+                coba={cobaMongo("DETAIL_BARANG", [{ $match: filter }, { $sort: urut }, { $limit: 20 }])}
                 note={`Kategori yang ada (distinct): ${kategoriUnik.join(", ")}. Tabel menampilkan maksimal 20 dokumen.`}
                 query={`db.DETAIL_BARANG.find(${JSON.stringify(filter, null, 2)})\n  .sort(${JSON.stringify(urut)}).limit(20)\n\ndb.DETAIL_BARANG.countDocuments(<filter yang sama>)\ndb.DETAIL_BARANG.distinct("kategori_barang")`}
                 rows={plain(hasil)}

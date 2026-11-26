@@ -2,6 +2,7 @@ import { Suspense } from "react";
 import { connection } from "next/server";
 import { getDb, plain, runPipeline } from "@/lib/mongo";
 import QueryCard from "@/components/QueryCard";
+import { cobaMongo } from "@/lib/konsol";
 import Memuat from "@/components/Memuat";
 import Kepala from "@/components/Kepala";
 import Status from "@/components/Status";
@@ -32,7 +33,7 @@ async function Isi() {
                 di {rows.length} rute. <span className="text-fox">{jalan} rute</span> sedang dilalui truk saat ini.
             </p>
             <MapScene cabang={cabang} rute={rows} />
-            <QueryCard title="Rute antarcabang" materi="$group + $addToSet" query={RUTE} error={rute.error}
+            <QueryCard title="Rute antarcabang" materi="$group + $addToSet" query={RUTE} coba={cobaMongo("PENGIRIMAN", RUTE)} error={rute.error}
                 note="Pengiriman dikelompokkan per pasangan asal dan tujuan. Status unik tiap rute dikumpulkan dengan $addToSet.">
                 {!rute.error && (
                     <ul className="divide-y divide-line rounded-lg border border-line">
