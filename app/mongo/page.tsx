@@ -1,20 +1,23 @@
 import { Suspense } from "react";
+import { connection } from "next/server";
 import type { Document, Sort } from "mongodb";
 import { getDb, plain } from "@/lib/mongo";
 import QueryCard from "@/components/QueryCard";
 import Memuat from "@/components/Memuat";
+import Kepala from "@/components/Kepala";
 import { KATEGORI } from "@/lib/opsi";
 import { hapusLog, tandaiDibaca } from "@/app/actions";
 
-const URUT: Record<string, Sort> = { nilai: { nilai_barang: -1 }, berat: { berat_kg: -1 }, nama: {
-deskripsi_barang: 1 } };
+const URUT: Record<string, Sort> = { nilai: { nilai_barang: -1 }, berat: { berat_kg: -1 }, nama: { deskripsi_barang: 1 } };
 const escapeRegex = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 const tahap = (p?: Document): string => (p ? [p.stage, tahap(p.inputStage)].filter(Boolean).join(" ← ") : "");
 const rencana = (e: Document) => tahap(e.queryPlanner?.winningPlan?.queryPlan ?? e.queryPlanner?.winningPlan);
 const satu = (v: string | string[] | undefined) => (Array.isArray(v) ? v[0] : v);
-const inp = "rounded-lg border border-line bg-bg px-2 py-1.5 text-sm";
+const inp = "min-h-11 w-full rounded-lg border border-line bg-bg px-3 text-sm hover:border-muted";
+const sekunder = "min-h-11 rounded-lg border border-line px-3 text-sm";
 
 async function Isi({ searchParams }: { searchParams: PageProps<"/mongo">["searchParams"] }) {
+    await connection(); // driver MongoDB memakai waktu saat ini, jadi wajib dirender per request
     const sp = await searchParams;
     const kat = [sp.kategori ?? []].flat().filter((k) => KATEGORI.includes(k));
     const min = satu(sp.min), max = satu(sp.max), q = satu(sp.q), urutKey = satu(sp.urut) ?? "nilai";
@@ -29,6 +32,7 @@ async function Isi({ searchParams }: { searchParams: PageProps<"/mongo">["search
     if (b3) filter.tingkat_bahaya = { $ne: "Non-B3" };
     if (catatan) filter.catatan_penanganan = { $exists: true };
     const urut = URUT[urutKey] ?? URUT.nilai;
+
     const db = await getDb();
     const barang = db.collection("DETAIL_BARANG");
     const kendaraan = db.collection("KENDARAAN");
@@ -45,71 +49,73 @@ async function Isi({ searchParams }: { searchParams: PageProps<"/mongo">["search
 
     return (
         <>
-            <form className="flex flex-wrap items-end gap-3 rounded-xl border border-line bg-surface p-4 text-sm">
-                <fieldset className="flex flex-wrap gap-2">
-                    <legend className="mb-1 text-muted">Kategori ($in)</legend>
+            <form className="space-y-4 rounded-xl border border-line bg-surface p-4 sm:p-5">
+                <fieldset className="flex flex-wrap gap-x-4 gap-y-1">
+                    <legend className="mb-1 text-sm text-muted">Kategori <code className="font-mono text-xs text-ice">$in</code></legend>
                     {KATEGORI.map((k) => (
-                        <label key={k} className="flex items-center gap-1">
-                            <input type="checkbox" name="kategori" value={k} defaultChecked={kat.includes(k)} /> {k}
+                        <label key={k} className="flex min-h-11 items-center gap-2 text-sm">
+                            <input type="checkbox" name="kategori" value={k} defaultChecked={kat.includes(k)} className="size-4" /> {k}
                         </label>
                     ))}
                 </fieldset>
-                <label className="space-y-1"><span className="block text-muted">Nilai min ($gte)</span><input
-name="min" type="number" defaultValue={min} className={inp} /></label>
-                <label className="space-y-1"><span className="block text-muted">Nilai max ($lte)</span><input
-name="max" type="number" defaultValue={max} className={inp} /></label>
-                <label className="space-y-1"><span className="block text-muted">Cari teks ($regex)</span><input
-name="q" maxLength={50} defaultValue={q} className={inp} /></label>
-                <label className="space-y-1"><span className="block text-muted">Urutkan (sort)</span>
-                    <select name="urut" defaultValue={urutKey} className={inp}>
-                        <option value="nilai">Nilai terbesar</option><option value="berat">Terberat</option><option
-value="nama">Nama A–Z</option>
-                    </select>
-                </label>
-                <label className="flex items-center gap-1"><input type="checkbox" name="b3" defaultChecked={b3} />
-Hanya B3 ($ne)</label>
-                <label className="flex items-center gap-1"><input type="checkbox" name="catatan" defaultChecked=
-{catatan} /> Punya catatan ($exists)</label>
-                <button className="rounded-lg bg-accent px-4 py-2 font-medium text-bg">Cari</button>
+                <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                    <label className="space-y-1 text-sm"><span className="block text-muted">Nilai min <code className="font-mono text-xs text-ice">$gte</code></span>
+                        <input name="min" type="number" defaultValue={min} className={inp} /></label>
+                    <label className="space-y-1 text-sm"><span className="block text-muted">Nilai max <code className="font-mono text-xs text-ice">$lte</code></span>
+                        <input name="max" type="number" defaultValue={max} className={inp} /></label>
+                    <label className="space-y-1 text-sm"><span className="block text-muted">Cari deskripsi <code className="font-mono text-xs text-ice">$regex</code></span>
+                        <input name="q" maxLength={50} defaultValue={q} className={inp} placeholder="misal: laptop" /></label>
+                    <label className="space-y-1 text-sm"><span className="block text-muted">Urutkan <code className="font-mono text-xs text-ice">sort()</code></span>
+                        <select name="urut" defaultValue={urutKey} className={inp}>
+                            <option value="nilai">Nilai terbesar</option>
+                            <option value="berat">Terberat</option>
+                            <option value="nama">Nama A–Z</option>
+                        </select>
+                    </label>
+                </div>
+                <div className="flex flex-wrap items-center justify-between gap-3 border-t border-line pt-4">
+                    <div className="flex flex-wrap gap-x-5">
+                        <label className="flex min-h-11 items-center gap-2 text-sm">
+                            <input type="checkbox" name="b3" defaultChecked={b3} className="size-4" /> Hanya barang B3 <code className="font-mono text-xs text-ice">$ne</code>
+                        </label>
+                        <label className="flex min-h-11 items-center gap-2 text-sm">
+                            <input type="checkbox" name="catatan" defaultChecked={catatan} className="size-4" /> Punya catatan <code className="font-mono text-xs text-ice">$exists</code>
+                        </label>
+                    </div>
+                    <button className="min-h-11 rounded-lg bg-fox px-5 font-semibold text-bg hover:bg-fox-deep hover:text-ink">Cari barang</button>
+                </div>
             </form>
 
             <QueryCard
-                title={`Hasil pencarian: ${jumlah} dokumen`}
-                materi="find() · sort() · limit() · countDocuments() · distinct()"
-                note={`distinct("kategori_barang") = ${kategoriUnik.join(", ")}`}
-                query={`db.DETAIL_BARANG.find(${JSON.stringify(filter, null, 2)})\n
-                .sort(${JSON.stringify(urut)}).limit(20)\n\ndb.DETAIL_BARANG.countDocuments(<filter yang
-                sama>)\ndb.DETAIL_BARANG.distinct("kategori_barang")`}
+                title={`${jumlah} barang cocok`}
+                materi="find · sort · limit · countDocuments · distinct"
+                note={`Kategori yang ada (distinct): ${kategoriUnik.join(", ")}. Tabel menampilkan maksimal 20 dokumen.`}
+                query={`db.DETAIL_BARANG.find(${JSON.stringify(filter, null, 2)})\n  .sort(${JSON.stringify(urut)}).limit(20)\n\ndb.DETAIL_BARANG.countDocuments(<filter yang sama>)\ndb.DETAIL_BARANG.distinct("kategori_barang")`}
                 rows={plain(hasil)}
             />
 
             <QueryCard
                 title="Pengaruh index terhadap rencana eksekusi"
                 materi="createIndex · explain()"
-                note="IXSCAN = memakai index, COLLSCAN = memindai seluruh collection."
-                query={`db.KENDARAAN.find({ plat_nomor: "L 9123 UA" }).explain("queryPlanner")\ndb.KENDARAAN.find({
-                merek_kendaraan: "Hino 500" }).explain("queryPlanner")\ndb.KENDARAAN.getIndexes()`}
+                note="IXSCAN berarti memakai index, COLLSCAN berarti memindai seluruh collection."
+                query={`db.KENDARAAN.find({ plat_nomor: "L 9123 UA" }).explain("queryPlanner")\ndb.KENDARAAN.find({ merek_kendaraan: "Hino 500" }).explain("queryPlanner")\ndb.KENDARAAN.getIndexes()`}
                 rows={[
-                    { query: '{ plat_nomor: "L 9123 UA" }', index_tersedia: "plat_nomor_1 (unique)", rencana:
-                rencana(exIndex) },
-                    { query: '{ merek_kendaraan: "Hino 500" }', index_tersedia: "—", rencana: rencana(exTanpa) },
-                    ...plain(indexes).map((ix) => ({ query: "getIndexes()", index_tersedia: ix.name, rencana:
-                JSON.stringify(ix.key) })),
-            ]}
+                    { query: '{ plat_nomor: "L 9123 UA" }', index_tersedia: "plat_nomor_1 (unique)", rencana: rencana(exIndex) },
+                    { query: '{ merek_kendaraan: "Hino 500" }', index_tersedia: "tidak ada", rencana: rencana(exTanpa) },
+                    ...plain(indexes).map((ix) => ({ query: "getIndexes()", index_tersedia: ix.name, rencana: JSON.stringify(ix.key) })),
+                ]}
             />
 
             <QueryCard
-                title="Log aktivitas (ditulis otomatis setiap transaksi MySQL)"
+                title="Log aktivitas"
                 materi="insertOne · find · updateMany · deleteMany"
-                query={`db.LOG_AKTIVITAS.insertOne({ aksi, detail, waktu: new Date(), dibaca: false }) // dari halaman Transaksi\ndb.LOG_AKTIVITAS.find().sort({ waktu: -1 }).limit(10)\ndb.LOG_AKTIVITAS.updateMany({ dibaca: false
-            }, { $set: { dibaca: true } })\ndb.LOG_AKTIVITAS.deleteMany({})`}
+                note="Ditulis otomatis setiap ada transaksi di halaman Transaksi (MySQL)."
+                query={`db.LOG_AKTIVITAS.insertOne({ aksi, detail, waktu: new Date(), dibaca: false }) // dari halaman Transaksi\ndb.LOG_AKTIVITAS.find().sort({ waktu: -1 }).limit(10)\ndb.LOG_AKTIVITAS.updateMany({ dibaca: false }, { $set: { dibaca: true } })\ndb.LOG_AKTIVITAS.deleteMany({})`}
                 rows={plain(log)}
             >
-
-                <div className="flex gap-2 text-sm">
-                    <form action={tandaiDibaca}><button className="rounded-lg border border-line px-3 py-1 hover:borderprimary">Tandai dibaca (updateMany)</button></form>
-                    <form action={hapusLog}><button className="rounded-lg border border-line px-3 py-1 text-bad
-hover:border-bad">Hapus semua (deleteMany)</button></form>
+                <div className="flex flex-wrap gap-2">
+                    <form action={tandaiDibaca}><button className={`${sekunder} hover:border-fox`}>Tandai semua dibaca</button></form>
+                    <form action={hapusLog}><button className={`${sekunder} text-bad hover:border-bad`}>Hapus semua log</button></form>
                 </div>
             </QueryCard>
         </>
@@ -119,8 +125,10 @@ hover:border-bad">Hapus semua (deleteMany)</button></form>
 export default function Mongo(props: PageProps<"/mongo">) {
     return (
         <>
-            <h1 className="text-2xl font-bold">MongoDB: Method, Filter, Operator, Index</h1>
-            <Suspense fallback={<Memuat />}><Isi searchParams={props.searchParams} /></Suspense>
+            <Kepala sumber="MongoDB · DETAIL_BARANG, KENDARAAN, LOG_AKTIVITAS" judul="Cari barang, baca index, kelola log">
+                Setiap kolom formulir memetakan ke satu operator query. Hasil, rencana eksekusi, dan perintah tulisnya tampil di bawah.
+            </Kepala>
+            <Suspense fallback={<Memuat apa="dokumen MongoDB" />}><Isi searchParams={props.searchParams} /></Suspense>
         </>
     );
 }
