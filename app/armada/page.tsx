@@ -1,8 +1,9 @@
 import { Suspense } from "react";
 import { connection } from "next/server";
 import { runPipeline } from "@/lib/mongo";
-import QueryCard from "@/components/QueryCard";
+import QueryCard, { GagalQuery } from "@/components/QueryCard";
 import Memuat from "@/components/Memuat";
+import Kepala from "@/components/Kepala";
 import TruckScene, { type Util } from "@/components/three/TruckScene";
 
 const UTIL = [
@@ -13,8 +14,8 @@ const UTIL = [
     { $project: {
         plat_nomor: "$kendaraan.plat_nomor", jenis: "$kendaraan.jenis_kendaraan",
         muatan_kg: { $sum: "$barang.berat_kg" }, kapasitas_kg: "$kendaraan.kapasitas_berat_kg",
-        utilisasi_persen: { $round: [{ $multiply: [100, { $divide: [{ $sum: "$barang.berat_kg" },
-"$kendaraan.kapasitas_berat_kg"] }] }, 1] } } },
+        utilisasi_persen: { $round: [{ $multiply: [100, { $divide: [{ $sum: "$barang.berat_kg" }, "$kendaraan.kapasitas_berat_kg"] }] }, 1] },
+    } },
     { $sort: { utilisasi_persen: -1 } },
 ];
 
@@ -23,9 +24,9 @@ async function Isi() {
     const u = await runPipeline("PENUGASAN_ARMADA", UTIL);
     return (
         <>
-            <TruckScene data={u.rows as Util[]} />
-            <QueryCard title="Utilisasi per penugasan (4 collection)" materi="$lookup ×3 + $unwind + $divide" query=
-{UTIL} rows={u.rows} error={u.error} />
+            {u.error ? <GagalQuery error={u.error} /> : <TruckScene data={u.rows as Util[]} />}
+            <QueryCard title="Utilisasi per penugasan" materi="$lookup ×3 + $unwind + $divide" query={UTIL} rows={u.rows} error={u.error}
+                note="Empat collection digabung: penugasan, pengiriman, barang, dan kendaraan." />
         </>
     );
 }
@@ -33,10 +34,11 @@ async function Isi() {
 export default function Armada() {
     return (
         <>
-            <h1 className="text-2xl font-bold">Utilisasi Kapasitas Armada</h1>
-            <p className="text-muted">Isi bak = berat muatan ÷ kapasitas. Hijau di bawah 70%, kuning 70–90%, merah di
-atas 90%.</p>
-            <Suspense fallback={<Memuat />}><Isi /></Suspense>
+            <Kepala sumber="MongoDB · PENUGASAN_ARMADA, KENDARAAN, DETAIL_BARANG" judul="Seberapa penuh setiap truk?">
+                Isi bak = total berat barang ÷ kapasitas kendaraan. <span className="text-ok">Hijau</span> di bawah 70%,{" "}
+                <span className="text-warn">kuning</span> 70 sampai 90%, <span className="text-bad">merah</span> di atas 90%.
+            </Kepala>
+            <Suspense fallback={<Memuat apa="data armada" />}><Isi /></Suspense>
         </>
     );
 }
