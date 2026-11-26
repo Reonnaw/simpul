@@ -1,3 +1,4 @@
+import Link from "next/link";
 import DataTable from "./DataTable";
 
 type Props = {
@@ -7,6 +8,7 @@ type Props = {
     rows?: Record<string, unknown>[];
     error?: string | null;
     note?: string;
+    coba?: string; // link ke /konsol dengan query ini terisi (lib/konsol: cobaSql, cobaMongo)
     children?: React.ReactNode;
 };
 
@@ -18,7 +20,7 @@ export function GagalQuery({ error }: { error: string }) {
     );
 }
 
-export default function QueryCard({ title, materi, query, rows, error, note, children }: Props) {
+export default function QueryCard({ title, materi, query, rows, error, note, coba, children }: Props) {
     const text = typeof query === "string" ? query : JSON.stringify(query, null, 2);
     return (
         <section className="rounded-xl border border-line bg-surface">
@@ -27,7 +29,14 @@ export default function QueryCard({ title, materi, query, rows, error, note, chi
                     <h2 className="font-display text-lg font-semibold">{title}</h2>
                     {note && <p className="text-sm text-muted">{note}</p>}
                 </div>
-                <code className="max-w-full rounded-md bg-raised px-2 py-1 font-mono text-xs text-ice">{materi}</code>
+                <div className="flex flex-wrap items-center gap-2">
+                    <code className="max-w-full rounded-md bg-raised px-2 py-1 font-mono text-xs text-ice">{materi}</code>
+                    {coba && (
+                        <Link href={coba} className="inline-flex min-h-9 items-center rounded-lg border border-line px-3 text-xs font-medium hover:border-fox hover:text-fox">
+                            Coba sendiri →
+                        </Link>
+                    )}
+                </div>
             </header>
             <div className="space-y-4 p-4 sm:p-5">
                 <details className="group">
