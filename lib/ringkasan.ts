@@ -6,7 +6,7 @@ export const OUT_REKAP: Document[] = [
     { $out: "REKAP_KATEGORI_BARANG" },
 ];
 
-    export const MERGE_JUMLAH: Document[] = [
+export const MERGE_JUMLAH: Document[] = [
     { $group: { _id: "$id_pelanggan", jumlah_pengiriman: { $sum: 1 } } },
     { $merge: { into: "RINGKASAN_PELANGGAN", on: "_id", whenMatched: "merge", whenNotMatched: "insert" } },
 ];

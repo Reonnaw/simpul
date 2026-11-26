@@ -4,8 +4,8 @@ import { getDb, runPipeline } from "@/lib/mongo";
 import { MERGE_JUMLAH, MERGE_TAGIHAN, OUT_REKAP } from "@/lib/ringkasan";
 
 export async function cariTerdekat(lng: number, lat: number, radiusKm: number) {
-    const valid = [lng, lat, radiusKm].every(Number.isFinite) && Math.abs(lng) <= 180 && Math.abs(lat) <= 90 &&
-radiusKm > 0 && radiusKm <= 2000;
+    const valid = [lng, lat, radiusKm].every(Number.isFinite) && Math.abs(lng) <= 180 && Math.abs(lat) <= 90
+        && radiusKm > 0 && radiusKm <= 2000;
     if (!valid) return { query: [], rows: [], error: "Input tidak valid" };
     const query = [
         { $geoNear: {
@@ -13,7 +13,7 @@ radiusKm > 0 && radiusKm <= 2000;
             distanceMultiplier: 0.001, maxDistance: radiusKm * 1000, spherical: true } },
         { $project: { nama_cabang: 1, kapasitas_gudang_ton: 1, jarak_km: { $round: ["$jarak_km", 1] } } },
     ];
-return { query, ...(await runPipeline("KANTOR_CABANG", query)) };
+    return { query, ...(await runPipeline("KANTOR_CABANG", query)) };
 }
 
 export async function bangunRingkasan() {

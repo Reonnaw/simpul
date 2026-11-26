@@ -40,8 +40,7 @@ async function idBerikut(conn: PoolConnection, tabel: string, kolom: string, awa
 }
 
 async function catat(aksi: string, detail: object) {
-    await (await getDb()).collection("LOG_AKTIVITAS").insertOne({ aksi, detail, waktu: new Date(), dibaca: false
-});
+    await (await getDb()).collection("LOG_AKTIVITAS").insertOne({ aksi, detail, waktu: new Date(), dibaca: false });
 }
 
 const kembali = (pesan: string) => redirect(`/transaksi?msg=${encodeURIComponent(pesan)}`);
@@ -75,17 +74,17 @@ export async function tambahPengiriman(form: FormData) {
             `INSERT INTO PENGIRIMAN (id_pengiriman, id_pelanggan, id_cabang_asal, id_cabang_tujuan, id_penugasan,
                 tanggal_pesan, tanggal_estimasi_tiba, status_pengiriman, jenis_layanan, prioritas_kiriman)
             VALUES (?, ?, ?, ?, NULL, CURDATE(), ?, 'Menunggu Penjadwalan', ?, ?)`,
-         [idKirim, pelanggan, asal, tujuan, estimasi, layanan, prioritas]);
+            [idKirim, pelanggan, asal, tujuan, estimasi, layanan, prioritas]);
         if (form.get("simulasi_gagal")) throw new Error("Simulasi gagal setelah INSERT pertama, jadi INSERT PENGIRIMAN ikut dibatalkan");
         await conn.execute(
             `INSERT INTO DETAIL_BARANG (id_barang, id_pengiriman, deskripsi_barang, kategori_barang, berat_kg,
-volume_m3, nilai_barang, tingkat_bahaya)
+                volume_m3, nilai_barang, tingkat_bahaya)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-          [idBarang, idKirim, barang.deskripsi_barang, barang.kategori_barang, barang.berat_kg, barang.volume_m3,
-barang.nilai_barang, barang.tingkat_bahaya]);
+            [idBarang, idKirim, barang.deskripsi_barang, barang.kategori_barang, barang.berat_kg, barang.volume_m3,
+                barang.nilai_barang, barang.tingkat_bahaya]);
         await conn.commit();
         committed = true;
-            
+
         // shortcut: dual-write tanpa transaksi lintas database; kalau MongoDB gagal, data MySQL tetap tersimpan
         const db = await getDb();
         await db.collection<Dok>("PENGIRIMAN").insertOne({
@@ -95,7 +94,7 @@ barang.nilai_barang, barang.tingkat_bahaya]);
         await db.collection<Dok>("DETAIL_BARANG").insertOne({ _id: idBarang, id_pengiriman: idKirim, ...barang });
         await catat("INSERT", { id_pengiriman: idKirim, id_barang: idBarang });
         pesan = `Berhasil: ${idKirim} dan ${idBarang} tersimpan (COMMIT) lalu disalin ke MongoDB`;
-} catch (e) {
+    } catch (e) {
         if (!committed) await conn.rollback().catch(() => {});
         pesan = (committed ? "Tersimpan di MySQL, tapi gagal sinkron ke MongoDB: " : "Gagal, transaksi di-ROLLBACK: ") + (e as Error).message;
     } finally {
@@ -111,8 +110,7 @@ export async function ubahStatus(form: FormData) {
         const status = pilih(form, "status", STATUS);
         const [res] = await pool.execute<ResultSetHeader>(
             "UPDATE PENGIRIMAN SET status_pengiriman = ? WHERE id_pengiriman = ?", [status, id]);
-        await (await getDb()).collection<Dok>("PENGIRIMAN").updateOne({ _id: id }, { $set: { status_pengiriman:
-status } });
+        await (await getDb()).collection<Dok>("PENGIRIMAN").updateOne({ _id: id }, { $set: { status_pengiriman: status } });
         await catat("UPDATE", { id_pengiriman: id, status });
         pesan = `UPDATE ${id}: ${res.affectedRows} baris berubah`;
     } catch (e) {
@@ -128,15 +126,12 @@ export async function hapusPengiriman(form: FormData) {
         const [res] = await pool.execute<ResultSetHeader>("DELETE FROM PENGIRIMAN WHERE id_pengiriman = ?", [id]);
         const db = await getDb();
         await db.collection<Dok>("PENGIRIMAN").deleteOne({ _id: id });
-        for (const c of ["DETAIL_BARANG", "FAKTUR", "ASURANSI"]) await db.collection(c).deleteMany({ id_pengiriman:
-id });
+        for (const c of ["DETAIL_BARANG", "FAKTUR", "ASURANSI"]) await db.collection(c).deleteMany({ id_pengiriman: id });
         await catat("DELETE", { id_pengiriman: id });
-        pesan = `DELETE ${id}: ${res.affectedRows} baris dihapus; DETAIL_BARANG, FAKTUR, ASURANSI ikut terhapus (ON
-DELETE CASCADE)`;
+        pesan = `DELETE ${id}: ${res.affectedRows} baris dihapus; DETAIL_BARANG, FAKTUR, ASURANSI ikut terhapus (ON DELETE CASCADE)`;
     } catch (e) {
         const err = e as { errno?: number; message: string };
-        pesan = err.errno === 1451 ? "Ditolak FOREIGN KEY (ON DELETE RESTRICT): " + err.message : "Gagal: " +
-err.message;
+        pesan = err.errno === 1451 ? "Ditolak FOREIGN KEY (ON DELETE RESTRICT): " + err.message : "Gagal: " + err.message;
     }
     kembali(pesan);
 }

@@ -16,8 +16,7 @@ export function plain<T>(x: T): T {
     return JSON.parse(JSON.stringify(x));
 }
 
-export async function runPipeline(collection: string, pipeline: Document[]): Promise<{ rows: Document[]; error:
-string | null }> {
+export async function runPipeline(collection: string, pipeline: Document[]): Promise<{ rows: Document[]; error: string | null }> {
     try {
         const rows = await (await getDb()).collection(collection).aggregate(pipeline).toArray();
         return { rows: plain(rows), error: null };

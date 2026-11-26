@@ -1,7 +1,6 @@
 import mysql from "mysql2/promise";
 const g = globalThis as unknown as { pool?: mysql.Pool };
 
-
 // createPool belum membuka koneksi; koneksi dibuat saat query pertama
 export const pool =
     g.pool ??
