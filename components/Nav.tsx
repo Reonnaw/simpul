@@ -4,7 +4,7 @@ import { usePathname } from "next/navigation";
 
 const GRUP: { judul: string; menu: [string, string][] }[] = [
     { judul: "Dunia 3D", menu: [["/", "Peta jaringan"], ["/hierarki", "Hierarki cabang"], ["/armada", "Armada"], ["/normalisasi", "Skema & normalisasi"]] },
-    { judul: "Basis data", menu: [["/transaksi", "Transaksi"], ["/laporan-sql", "Laporan SQL"], ["/mongo", "MongoDB"], ["/analitik", "Analitik"]] },
+    { judul: "Basis data", menu: [["/transaksi", "Transaksi"], ["/laporan-sql", "Laporan SQL"], ["/mongo", "MongoDB"], ["/analitik", "Analitik"], ["/konsol", "Konsol query"]] },
 ];
 
 export default function Nav() {
