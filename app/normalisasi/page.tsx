@@ -2,6 +2,7 @@ import { Suspense } from "react";
 import { connection } from "next/server";
 import { runSql } from "@/lib/mysql";
 import QueryCard, { GagalQuery } from "@/components/QueryCard";
+import { cobaSql } from "@/lib/konsol";
 import Memuat from "@/components/Memuat";
 import Kepala from "@/components/Kepala";
 import ErdScene, { type Rel, type Tbl } from "@/components/three/ErdScene";
@@ -24,8 +25,8 @@ async function Isi() {
     return (
         <>
             {t.error ? <GagalQuery error={t.error} /> : <ErdScene tabel={t.rows as Tbl[]} relasi={r.rows as Rel[]} />}
-            <QueryCard title="Daftar tabel (data dictionary)" materi="INFORMATION_SCHEMA" query={TABEL} rows={t.rows} error={t.error} />
-            <QueryCard title="Seluruh FOREIGN KEY" materi="INFORMATION_SCHEMA.KEY_COLUMN_USAGE" query={RELASI} rows={r.rows} error={r.error} />
+            <QueryCard title="Daftar tabel (data dictionary)" materi="INFORMATION_SCHEMA" query={TABEL} coba={cobaSql(TABEL)} rows={t.rows} error={t.error} />
+            <QueryCard title="Seluruh FOREIGN KEY" materi="INFORMATION_SCHEMA.KEY_COLUMN_USAGE" query={RELASI} coba={cobaSql(RELASI)} rows={r.rows} error={r.error} />
         </>
     );
 }

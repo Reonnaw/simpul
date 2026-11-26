@@ -2,6 +2,7 @@ import { Suspense } from "react";
 import { connection } from "next/server";
 import { runSql } from "@/lib/mysql";
 import QueryCard from "@/components/QueryCard";
+import { cobaSql } from "@/lib/konsol";
 import Memuat from "@/components/Memuat";
 import Kepala from "@/components/Kepala";
 
@@ -82,7 +83,7 @@ FROM FAKTUR` },
 async function Isi() {
     await connection();
     const hasil = await Promise.all(Q.map((q) => runSql(q.sql)));
-    return Q.map((q, i) => <QueryCard key={i} title={q.title} materi={q.materi} query={q.sql} rows={hasil[i].rows} error={hasil[i].error} />);
+    return Q.map((q, i) => <QueryCard key={i} title={q.title} materi={q.materi} query={q.sql} coba={cobaSql(q.sql)} rows={hasil[i].rows} error={hasil[i].error} />);
 }
 
 export default function LaporanSql() {

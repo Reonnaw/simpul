@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import { runSql } from "@/lib/mysql";
 import QueryCard from "@/components/QueryCard";
+import { cobaSql } from "@/lib/konsol";
 import Memuat from "@/components/Memuat";
 import Kepala from "@/components/Kepala";
 import { BAHAYA, KATEGORI, LAYANAN, PRIORITAS, STATUS } from "@/lib/opsi";
@@ -84,7 +85,7 @@ async function Isi({ searchParams }: { searchParams: PageProps<"/transaksi">["se
                 </div>
             </form>
 
-            <QueryCard title="Daftar pengiriman" materi="INSERT · UPDATE · DELETE + TRANSACTION + FK"
+            <QueryCard title="Daftar pengiriman" materi="INSERT · UPDATE · DELETE + TRANSACTION + FK" coba={cobaSql(LIST_SQL)}
                 query={`${LIST_SQL}\n\n-- perintah tulis yang dipakai:\n${TX_SQL}`} error={list.error}>
                 {!list.error && (
                     <div className="overflow-x-auto rounded-lg border border-line">
