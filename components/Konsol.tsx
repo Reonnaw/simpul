@@ -87,7 +87,7 @@ export default function Konsol({ tabel, koleksi, awal }: Props) {
 
                     <div className="flex flex-wrap items-center gap-3">
                         <button onClick={() => jalankan()} disabled={memuat}
-                            className="min-h-11 rounded-lg bg-fox px-4 font-semibold text-bg hover:bg-fox-deep hover:text-ink disabled:opacity-60">
+                            className="min-h-11 rounded-lg bg-fox px-4 font-semibold text-bg hover:bg-fox-deep disabled:opacity-60">
                             {memuat ? "Menjalankan…" : "Jalankan"}
                         </button>
                         <span className="text-xs text-muted">Ctrl + Enter</span>

@@ -1,19 +1,20 @@
 @import "tailwindcss";
 
-/* Rubah malam: arang hangat sebagai dasar, oranye rubah untuk momen penting, biru es untuk data. */
+/* Rubah siang: kertas hangat sebagai dasar, oranye rubah untuk momen penting, biru laut untuk data.
+   Semua pasangan teks lolos WCAG AA (>= 4,5:1) di bg, surface, dan raised. */
 @theme {
-  --color-bg: #14110f;
-  --color-surface: #1d1916;
-  --color-raised: #27221e;
-  --color-line: #3a322c;
-  --color-ink: #f2e8da;
-  --color-muted: #b3a595;
-  --color-fox: #ff7a2f;
-  --color-fox-deep: #c9531a;
-  --color-ice: #8cc8e6;
-  --color-ok: #8fd18a;
-  --color-warn: #f2c14e;
-  --color-bad: #ff6b6b;
+  --color-bg: #faf7f2;
+  --color-surface: #ffffff;
+  --color-raised: #f1ece4;
+  --color-line: #e3dacd;
+  --color-ink: #1f1a16;
+  --color-muted: #6b5e52;
+  --color-fox: #b8440d;
+  --color-fox-deep: #8f340a;
+  --color-ice: #1f6f9e;
+  --color-ok: #2f7d3a;
+  --color-warn: #a16207;
+  --color-bad: #c0392b;
 }
 
 @theme inline {
@@ -23,7 +24,7 @@
 }
 
 :root {
-  color-scheme: dark;
+  color-scheme: light;
   accent-color: var(--color-fox);
 }
 

@@ -83,7 +83,7 @@ async function Isi({ searchParams }: { searchParams: PageProps<"/mongo">["search
                             <input type="checkbox" name="catatan" defaultChecked={catatan} className="size-4" /> Punya catatan <code className="font-mono text-xs text-ice">$exists</code>
                         </label>
                     </div>
-                    <button className="min-h-11 rounded-lg bg-fox px-5 font-semibold text-bg hover:bg-fox-deep hover:text-ink">Cari barang</button>
+                    <button className="min-h-11 rounded-lg bg-fox px-5 font-semibold text-bg hover:bg-fox-deep">Cari barang</button>
                 </div>
             </form>
 

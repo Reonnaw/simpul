@@ -11,7 +11,7 @@ function Blok({ t, p, nada, onPilih }: { t: Tbl; p: V3; nada: "pilih" | "terkait
     const [hover, setHover] = useState(false);
     useCursor(hover);
     const h = 0.3 + t.jumlah_kolom * 0.14;
-    const warna = nada === "pilih" ? W.fox : nada === "redup" ? W.raised : W.ice;
+    const warna = nada === "pilih" ? W.fox : nada === "redup" ? "#cfc5b8" : W.ice;
     return (
         <group position={p}>
             <mesh position-y={h / 2} scale={hover ? 1.08 : 1}
@@ -47,7 +47,7 @@ export default function ErdScene({ tabel, relasi }: { tabel: Tbl[]; relasi: Rel[
             petunjuk="Klik tabel untuk menyorot FOREIGN KEY yang terhubung. Tinggi balok = jumlah kolom.">
             <mesh rotation-x={-Math.PI / 2} position-y={-0.01} onClick={() => setPilih(null)}>
                 <circleGeometry args={[11.5, 6]} />
-                <meshStandardMaterial color="#1a1714" flatShading />
+                <meshStandardMaterial color="#e9e3da" flatShading />
             </mesh>
             {tabel.map((t) => {
                 const k = t.tabel.toUpperCase();

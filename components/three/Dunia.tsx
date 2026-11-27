@@ -7,8 +7,8 @@ import type { OrbitControls as Kontrol } from "three-stdlib";
 
 // three.js tidak bisa membaca variabel CSS, jadi palet dari globals.css disalin di sini.
 export const W = {
-    bg: "#14110f", surface: "#1d1916", raised: "#27221e", line: "#3a322c", ink: "#f2e8da", muted: "#b3a595",
-    fox: "#ff7a2f", foxDeep: "#c9531a", ice: "#8cc8e6", ok: "#8fd18a", warn: "#f2c14e", bad: "#ff6b6b",
+    bg: "#faf7f2", surface: "#ffffff", raised: "#f1ece4", line: "#e3dacd", ink: "#1f1a16", muted: "#6b5e52",
+    fox: "#b8440d", foxDeep: "#8f340a", ice: "#1f6f9e", ok: "#2f7d3a", warn: "#a16207", bad: "#c0392b",
 };
 
 // animasi dimatikan untuk pengguna yang memilih "kurangi gerakan" di sistem operasinya
@@ -69,7 +69,7 @@ export function Panggung({ kamera, fov = 35, lebar, tinggi = "h-[420px] sm:h-[52
             <Canvas camera={{ position: kamera, fov }} dpr={[1, 2]} shadows={bayangan} aria-label={label}>
                 <color attach="background" args={[W.bg]} />
                 <fog attach="fog" args={kabut} />
-                {cahaya && <hemisphereLight args={["#ffe6cc", "#1a2a33", 0.9]} />}
+                {cahaya && <hemisphereLight args={["#fff6ec", "#cfc6ba", 1.3]} />}
                 {cahaya && <directionalLight position={[8, 14, 6]} intensity={1.6} color="#fff1e0" />}
                 <Bingkai lebar={lebar} pusat={target} kontrol={kontrol} />
                 <Wadah value={wadah}>{children}</Wadah>
@@ -89,8 +89,8 @@ export function Panggung({ kamera, fov = 35, lebar, tinggi = "h-[420px] sm:h-[52
 
 // Maskot rubah low-poly, menghadap +x. flatShading supaya segi-seginya sama dengan logo.
 export function Rubah({ skala = 1 }: { skala?: number }) {
-    const oranye = <meshStandardMaterial color={W.fox} flatShading />;
-    const krem = <meshStandardMaterial color={W.ink} flatShading />;
+    const oranye = <meshStandardMaterial color="#ff7a2f" flatShading />;
+    const krem = <meshStandardMaterial color="#f2e8da" flatShading />;
     const gelap = <meshStandardMaterial color="#2a1a12" flatShading />;
     return (
         <group scale={skala}>

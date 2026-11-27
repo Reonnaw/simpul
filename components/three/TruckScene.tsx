@@ -34,11 +34,11 @@ function Truk({ u, x, dipilih, gerak, onPilih }: { u: Util; x: number; dipilih: 
             onPointerOver={(e) => { e.stopPropagation(); setHover(true); }}
             onPointerOut={() => setHover(false)}>
             <mesh position={[0, 0.5, 0]}><boxGeometry args={[1.3, 0.22, 4.3]} /><meshStandardMaterial color="#2a2420" /></mesh>
-            <mesh position={[0, 1.17, -1.6]}><boxGeometry args={[1.3, 1.15, 1]} /><meshStandardMaterial color={W.ink} flatShading /></mesh>
+            <mesh position={[0, 1.17, -1.6]}><boxGeometry args={[1.3, 1.15, 1]} /><meshStandardMaterial color="#f4efe8" flatShading /></mesh>
             <mesh position={[0, 1.42, -1.72]}><boxGeometry args={[1.32, 0.4, 0.55]} /><meshStandardMaterial color="#1a2a33" /></mesh>
             <mesh position={[0, 1.42, 0.55]}>
                 <boxGeometry args={[1.36, 1.6, 3]} />
-                <meshStandardMaterial color={W.ink} transparent opacity={0.07} depthWrite={false} />
+                <meshStandardMaterial color={W.ink} transparent opacity={0.05} depthWrite={false} />
                 <Edges color={sorot ? W.fox : "#8a7a6a"} />
             </mesh>
             <mesh ref={isi} position={[0, 0.64, 0.55]} scale-y={gerak ? 0.001 : f}>
@@ -78,17 +78,17 @@ export default function TruckScene({ data }: { data: Util[] }) {
                 petunjuk="Klik truk untuk menyorot kartunya. Seret untuk melihat dari samping.">
                 <mesh rotation-x={-Math.PI / 2} onClick={() => setPilih(null)}>
                     <planeGeometry args={[80, 60]} />
-                    <meshStandardMaterial color="#1a1714" />
+                    <meshStandardMaterial color="#e9e3da" />
                 </mesh>
                 {data.map((_, i) => [-0.5, 0.5].map((d) => (
                     <mesh key={`${i}${d}`} position={[xOf(i) + d * JARAK, 0.005, 0.2]} rotation-x={-Math.PI / 2}>
                         <planeGeometry args={[0.06, 5.2]} />
-                        <meshBasicMaterial color="#4a4038" />
+                        <meshBasicMaterial color="#c4b8a9" />
                     </mesh>
                 )))}
                 <mesh position={[0, 0.35, -2.9]}>
                     <boxGeometry args={[data.length * JARAK + 1, 0.7, 0.6]} />
-                    <meshStandardMaterial color="#2e2722" flatShading />
+                    <meshStandardMaterial color="#d6cdc1" flatShading />
                 </mesh>
                 <ContactShadows position={[0, 0.01, 0]} opacity={0.55} scale={40} blur={2.2} far={4} />
                 {data.map((u, i) => <Truk key={u._id} u={u} x={xOf(i)} dipilih={pilih === u._id} gerak={gerak} onPilih={() => toggle(u._id)} />)}

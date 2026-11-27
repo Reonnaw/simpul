@@ -26,7 +26,7 @@ DELETE FROM PENGIRIMAN WHERE id_pengiriman = ?; -- DETAIL_BARANG, FAKTUR, ASURAN
 
 const s = (v: unknown) => String(v ?? "");
 const inp = "min-h-11 w-full rounded-lg border border-line bg-bg px-3 text-sm hover:border-muted";
-const tombol = "min-h-11 rounded-lg bg-fox px-4 font-semibold text-bg hover:bg-fox-deep hover:text-ink";
+const tombol = "min-h-11 rounded-lg bg-fox px-4 font-semibold text-bg hover:bg-fox-deep";
 
 function F({ label, children }: { label: string; children: React.ReactNode }) {
     return <label className="block space-y-1 text-sm"><span className="text-muted">{label}</span>{children}</label>;

@@ -161,7 +161,7 @@ async function Isi() {
                 query={{ "DETAIL_BARANG ($out)": OUT_REKAP, "PENGIRIMAN ($merge 1)": MERGE_JUMLAH, "FAKTUR ($merge 2)": MERGE_TAGIHAN }}
                 note="Tombol menjalankan ketiga pipeline. Tambah pengiriman di halaman Transaksi lalu jalankan lagi: angka di bawah ikut berubah.">
                 <form action={bangunRingkasan}>
-                    <button className="min-h-11 rounded-lg bg-fox px-4 font-semibold text-bg hover:bg-fox-deep hover:text-ink">Bangun ulang ringkasan</button>
+                    <button className="min-h-11 rounded-lg bg-fox px-4 font-semibold text-bg hover:bg-fox-deep">Bangun ulang ringkasan</button>
                 </form>
                 <div className="grid gap-4 xl:grid-cols-2">
                     <QueryCard title="Isi REKAP_KATEGORI_BARANG" materi="find()" query="db.REKAP_KATEGORI_BARANG.find().sort({ total_nilai: -1 })"
