@@ -2,9 +2,9 @@ import Status, { adalahStatus } from "./Status";
 
 const ISO = /^\d{4}-\d{2}-\d{2}T/;
 const tanggal = new Intl.DateTimeFormat("id-ID", { dateStyle: "medium", timeStyle: "short", timeZone: "Asia/Jakarta" });
-const judulKolom = (c: string) => (c === "_id" ? "id" : c.replace(/_/g, " "));
+export const judulKolom = (c: string) => (c === "_id" ? "id" : c.replace(/_/g, " "));
 
-function Sel({ v }: { v: unknown }) {
+export function Sel({ v }: { v: unknown }) {
     if (v == null) return <span className="text-muted">-</span>;
     if (adalahStatus(v)) return <Status s={v} />;
     if (typeof v === "number") return <>{v.toLocaleString("id-ID")}</>;
