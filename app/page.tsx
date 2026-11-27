@@ -28,10 +28,21 @@ async function Isi() {
 
     return (
         <>
-            <p className="text-muted">
-                {cabang.length} cabang, {totalTon.toLocaleString("id-ID")} ton kapasitas gudang, {totalKirim} pengiriman
-                di {rows.length} rute. <span className="text-fox">{jalan} rute</span> sedang dilalui truk saat ini.
-            </p>
+            <dl className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+                {[
+                    ["Cabang", cabang.length.toLocaleString("id-ID"), ""],
+                    ["Kapasitas gudang", `${totalTon.toLocaleString("id-ID")} t`, ""],
+                    ["Pengiriman", totalKirim.toLocaleString("id-ID"), `di ${rows.length} rute`],
+                    ["Truk di jalan", jalan.toLocaleString("id-ID"), "rute aktif"],
+                ].map(([k, v, sub], i) => (
+                    <div key={k} className="rounded-xl border border-line bg-surface px-4 py-3">
+                        <dt className="text-xs text-muted">{k}</dt>
+                        <dd className={`font-display text-2xl font-semibold tabular-nums ${i === 3 ? "text-fox" : ""}`}>
+                            {v} {sub && <span className="font-sans text-xs font-normal text-muted">{sub}</span>}
+                        </dd>
+                    </div>
+                ))}
+            </dl>
             <MapScene cabang={cabang} rute={rows} />
             <QueryCard title="Rute antarcabang" materi="$group + $addToSet" query={RUTE} coba={cobaMongo("PENGIRIMAN", RUTE)} error={rute.error}
                 note="Pengiriman dikelompokkan per pasangan asal dan tujuan. Status unik tiap rute dikumpulkan dengan $addToSet.">
@@ -59,7 +70,7 @@ export default function Peta() {
     return (
         <>
             <Kepala sumber="MongoDB · KANTOR_CABANG, PENGIRIMAN" judul="Jaringan cabang di Pulau Jawa">
-                Setiap menara adalah gudang cabang, setiap busur adalah rute pengiriman. Ikuti rubah ke cabang yang kamu pilih,
+                Pulau Jawa berelief dengan gunung api di posisi aslinya. Setiap tiang cahaya adalah gudang cabang, setiap jalur adalah rute pengiriman, dan kamu bisa mengemudikan mobil melintasinya. Ikuti rubah ke cabang yang kamu pilih,
                 atau klik sembarang titik di peta untuk menjalankan <code className="font-mono text-sm text-ice">$geoNear</code> dan
                 menemukan cabang terdekat.
             </Kepala>
