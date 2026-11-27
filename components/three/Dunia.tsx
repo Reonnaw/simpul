@@ -52,24 +52,30 @@ type Props = {
     pusat?: [number, number, number];
     petunjuk?: string;
     label: string;
+    kabut?: [string, number, number];
+    cahaya?: boolean; // false = scene memasang lampunya sendiri
+    bayangan?: boolean;
+    hud?: React.ReactNode; // lapisan HTML di atas kanvas
     children: React.ReactNode;
 };
 
-export function Panggung({ kamera, fov = 35, lebar, tinggi = "h-[420px] sm:h-[520px]", maxPolar = Math.PI / 2.3, pusat = [0, 0, 0], petunjuk, label, children }: Props) {
+export function Panggung({ kamera, fov = 35, lebar, tinggi = "h-[420px] sm:h-[520px]", maxPolar = Math.PI / 2.3, pusat = [0, 0, 0], petunjuk, label,
+    kabut = [W.bg, 40, 90], cahaya = true, bayangan = false, hud, children }: Props) {
     const kontrol = useRef<Kontrol>(null);
     const wadah = useRef<HTMLDivElement>(null);
     const [target] = useState(() => new THREE.Vector3(...pusat));
     return (
         <div ref={wadah} className={`relative overflow-hidden rounded-xl border border-line bg-bg ${tinggi}`}>
-            <Canvas camera={{ position: kamera, fov }} dpr={[1, 2]} aria-label={label}>
+            <Canvas camera={{ position: kamera, fov }} dpr={[1, 2]} shadows={bayangan} aria-label={label}>
                 <color attach="background" args={[W.bg]} />
-                <fog attach="fog" args={[W.bg, 40, 90]} />
-                <hemisphereLight args={["#ffe6cc", "#1a2a33", 0.9]} />
-                <directionalLight position={[8, 14, 6]} intensity={1.6} color="#fff1e0" />
+                <fog attach="fog" args={kabut} />
+                {cahaya && <hemisphereLight args={["#ffe6cc", "#1a2a33", 0.9]} />}
+                {cahaya && <directionalLight position={[8, 14, 6]} intensity={1.6} color="#fff1e0" />}
                 <Bingkai lebar={lebar} pusat={target} kontrol={kontrol} />
                 <Wadah value={wadah}>{children}</Wadah>
                 <OrbitControls ref={kontrol} makeDefault enableDamping target={target} maxPolarAngle={maxPolar} minDistance={4} maxDistance={70} />
             </Canvas>
+            {hud}
             <div className="pointer-events-none absolute inset-x-3 bottom-3 z-20 flex items-end justify-end gap-2 sm:justify-between">
                 <p className="hidden rounded-md bg-bg/80 px-2 py-1 text-xs text-muted sm:block">{petunjuk ?? "Seret untuk memutar, gulir atau cubit untuk zoom"}</p>
                 <button onClick={() => kontrol.current?.reset()}
