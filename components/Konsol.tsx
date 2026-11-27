@@ -1,13 +1,15 @@
 "use client";
 import { useState } from "react";
 import { jalankanMongo, jalankanSql, type HasilSql } from "@/app/konsol/actions";
+import { MAKS_PERINTAH, pecahSql } from "@/lib/konsol";
 import DataTable from "./DataTable";
+import TabelEdit from "./TabelEdit";
 import { GagalQuery } from "./QueryCard";
 
 type Mode = "sql" | "mongo";
 type Props = { tabel: string[]; koleksi: string[]; awal: { mode: Mode; sql: string; koleksi: string; pipeline: string } };
 type Hasil =
-    | { mode: "sql"; hasil: HasilSql[]; error?: string }
+    | { mode: "sql"; hasil: HasilSql[]; perintah: string[]; error?: string }
     | { mode: "mongo"; rows: Record<string, unknown>[]; total: number; error?: string };
 
 const KARTU = "rounded-xl border border-line bg-surface p-4 sm:p-5";
@@ -25,17 +27,25 @@ export default function Konsol({ tabel, koleksi, awal }: Props) {
     const [hasil, setHasil] = useState<Hasil | null>(null);
     const [memuat, setMemuat] = useState(false);
 
-    async function jalankan() {
+    async function jalankan(teksSql = sql) {
         if (memuat) return;
         setMemuat(true);
+        const perintah = pecahSql(teksSql);
         try {
             setHasil(mode === "sql"
-                ? { mode, ...(await jalankanSql(sql)) }
+                ? { mode, perintah, ...(await jalankanSql(teksSql)) }
                 : { mode, ...(await jalankanMongo(coll, pipeline)) });
         } catch (e) {
-            setHasil(mode === "sql" ? { mode, hasil: [], error: (e as Error).message } : { mode, rows: [], total: 0, error: (e as Error).message });
+            setHasil(mode === "sql" ? { mode, perintah, hasil: [], error: (e as Error).message } : { mode, rows: [], total: 0, error: (e as Error).message });
         }
         setMemuat(false);
+    }
+
+    // Perubahan dari tombol tabel disisipkan tepat sebelum SELECT-nya, supaya efeknya terlihat walau semuanya di-ROLLBACK.
+    function sisipkan(p: string[], i: number, baru: string) {
+        const teks = [...p.slice(0, i), baru, ...p.slice(i)].join(";\n");
+        setSql(teks);
+        jalankan(teks);
     }
 
     const teks = mode === "sql" ? sql : pipeline;
@@ -76,14 +86,14 @@ export default function Konsol({ tabel, koleksi, awal }: Props) {
                     </label>
 
                     <div className="flex flex-wrap items-center gap-3">
-                        <button onClick={jalankan} disabled={memuat}
+                        <button onClick={() => jalankan()} disabled={memuat}
                             className="min-h-11 rounded-lg bg-fox px-4 font-semibold text-bg hover:bg-fox-deep hover:text-ink disabled:opacity-60">
                             {memuat ? "Menjalankan…" : "Jalankan"}
                         </button>
                         <span className="text-xs text-muted">Ctrl + Enter</span>
                         <span className="text-xs text-muted sm:ml-auto">
                             {mode === "sql"
-                                ? "Boleh: SELECT, WITH, EXPLAIN, SHOW, DESC, INSERT, UPDATE, DELETE. Maksimal 5 perintah."
+                                ? `Boleh: SELECT, WITH, EXPLAIN, SHOW, DESC, INSERT, UPDATE, DELETE. Maksimal ${MAKS_PERINTAH} perintah.`
                                 : "Format JSON (kunci diberi tanda kutip). $out, $merge, dan operator JavaScript diblokir."}
                         </span>
                     </div>
@@ -112,7 +122,12 @@ export default function Konsol({ tabel, koleksi, awal }: Props) {
                     <section key={i} className={`${KARTU} space-y-3`}>
                         <pre className="max-h-32 overflow-auto font-mono text-xs text-ice">{h.sql}</pre>
                         {h.error ? <GagalQuery error={h.error} />
-                            : h.rows ? <><DataTable rows={h.rows} /><Terpotong total={h.total ?? 0} /></>
+                            : h.rows ? <>
+                                {h.tabel && h.pk && h.rows.length
+                                    ? <TabelEdit rows={h.rows} tabel={h.tabel} pk={h.pk} memuat={memuat} onUbah={(s) => sisipkan(hasil.perintah, i, s)} />
+                                    : <DataTable rows={h.rows} />}
+                                <Terpotong total={h.total ?? 0} />
+                            </>
                             : <p className="text-sm">{h.affectedRows} baris terpengaruh.</p>}
                     </section>
                 ))}

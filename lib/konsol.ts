@@ -8,7 +8,7 @@ const TERLARANG_SQL: [RegExp, string][] = [
 ];
 const TERLARANG_MONGO = new Set(["$out", "$merge", "$function", "$accumulator", "$where"]);
 
-export const MAKS_PERINTAH = 5;
+export const MAKS_PERINTAH = 10;
 export const MAKS_BARIS = 200;
 
 // Pecah di ";" yang bukan bagian string; komentar dibuang (diganti spasi) sehingga /*! ... */ tidak ikut dikirim.
