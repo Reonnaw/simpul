@@ -15,6 +15,22 @@
   --color-ok: #2f7d3a;
   --color-warn: #a16207;
   --color-bad: #c0392b;
+
+  /* rubah pengintip di tepi layar (components/RubahIntip.tsx) */
+  --animate-lompat: lompat 0.5s ease-out;
+  --animate-pusing: pusing 0.9s ease-in-out 2;
+
+  @keyframes lompat {
+    0%, 100% { transform: translateY(0) rotate(0); }
+    40% { transform: translateY(-16px) rotate(-10deg); }
+    70% { transform: translateY(0) rotate(5deg); }
+  }
+
+  @keyframes pusing {
+    0% { transform: rotate(0); }
+    50% { transform: rotate(200deg) scale(0.9); }
+    100% { transform: rotate(360deg); }
+  }
 }
 
 @theme inline {
