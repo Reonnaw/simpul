@@ -1,11 +1,23 @@
 "use server";
-import type { ResultSetHeader } from "mysql2";
+import type { FieldPacket, ResultSetHeader } from "mysql2";
 import { BSON } from "mongodb";
 import { pool } from "@/lib/mysql";
 import { getDb, plain } from "@/lib/mongo";
 import { MAKS_BARIS, MAKS_PERINTAH, cekPipeline, cekSql, pecahSql } from "@/lib/konsol";
 
-export type HasilSql = { sql: string; rows?: Record<string, unknown>[]; total?: number; affectedRows?: number; error?: string };
+export type HasilSql = {
+    sql: string; rows?: Record<string, unknown>[]; total?: number; affectedRows?: number; error?: string;
+    tabel?: string; pk?: string[]; // ada kalau hasilnya bisa diedit lewat tombol
+};
+
+// Bisa diedit kalau semua kolom asli dari satu tabel (tanpa alias/ekspresi) dan primary key-nya ikut di-SELECT.
+// shortcut: PK komposit yang hanya sebagian di-SELECT tidak terdeteksi, WHERE bisa kena >1 baris (tetap di-ROLLBACK); pakai SHOW KEYS kalau jadi masalah
+function sumberTabel(fields: FieldPacket[] | undefined) {
+    const t = fields?.[0]?.orgTable;
+    if (!t || !fields.every((f) => f.orgTable === t && f.name === f.orgName)) return {};
+    const pk = fields.filter((f) => (typeof f.flags === "number" ? f.flags & 2 : f.flags.includes("PRI_KEY"))).map((f) => f.name);
+    return pk.length ? { tabel: t, pk } : {};
+}
 
 // Semua perintah dijalankan dalam satu transaksi yang selalu di-ROLLBACK, jadi data asli tidak pernah berubah.
 export async function jalankanSql(teks: string): Promise<{ hasil: HasilSql[]; error?: string }> {
@@ -26,11 +38,11 @@ export async function jalankanSql(teks: string): Promise<{ hasil: HasilSql[]; er
         await conn.beginTransaction();
         for (const sql of perintah) {
             try {
-                const [res] = await conn.query(sql);
+                const [res, fields] = await conn.query(sql);
                 // shortcut: semua baris dibaca lalu dipotong; tambahkan LIMIT otomatis kalau tabelnya sudah ribuan baris
                 if (Array.isArray(res)) {
                     const rows = res as Record<string, unknown>[];
-                    hasil.push({ sql, rows: plain(rows.slice(0, MAKS_BARIS)), total: rows.length });
+                    hasil.push({ sql, rows: plain(rows.slice(0, MAKS_BARIS)), total: rows.length, ...sumberTabel(fields) });
                 } else hasil.push({ sql, affectedRows: (res as ResultSetHeader).affectedRows });
             } catch (e) {
                 hasil.push({ sql, error: (e as Error).message });
