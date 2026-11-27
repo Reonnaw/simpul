@@ -64,6 +64,11 @@ export function cekPipeline(p: unknown): string | null {
     return cariTerlarang(p);
 }
 
+// Dipakai tombol tabel edit di konsol untuk menulis INSERT/UPDATE/DELETE.
+export const kolomSql = (n: string) => `\`${n.replace(/`/g, "``")}\``;
+export const nilaiSql = (v: unknown) =>
+    v == null ? "NULL" : typeof v === "number" ? String(v) : `'${String(v).replace(/\\/g, "\\\\").replace(/'/g, "''")}'`;
+
 export const cobaSql = (sql: string) => `/konsol?${new URLSearchParams({ sql })}`;
 export const cobaMongo = (koleksi: string, pipeline: unknown[]) =>
     `/konsol?${new URLSearchParams({ koleksi, pipeline: JSON.stringify(pipeline) })}`;
