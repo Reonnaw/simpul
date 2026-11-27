@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Bricolage_Grotesque, JetBrains_Mono, Plus_Jakarta_Sans } from "next/font/google";
 import Logo from "@/components/Logo";
 import Nav from "@/components/Nav";
+import RubahIntip from "@/components/RubahIntip";
 import "./globals.css";
 
 // Bricolage: judul berkarakter yang cocok dengan rubah; Jakarta Sans: teks isi, dirancang untuk identitas Jakarta.
@@ -38,6 +39,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
                     </div>
                 </header>
                 <main id="isi" className="mx-auto w-full max-w-6xl min-w-0 space-y-6 px-4 py-6 lg:px-8 lg:py-10">{children}</main>
+                <RubahIntip />
             </body>
         </html>
     );
